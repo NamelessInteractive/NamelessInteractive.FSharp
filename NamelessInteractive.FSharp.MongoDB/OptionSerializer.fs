@@ -11,15 +11,22 @@ type OptionSerializer(objType) =
     let Cases = GetUnionCases objType
 
     override this.Serialize(writer, nominalType, value, options) =
-        let value = objType.GetProperty("Value").GetValue(value, [| |]) |> Some
+        if (value <> null) then
+            let v2 = objType.GetProperty("Value").GetValue(value, [| |]) |> Some
 
-        match unbox value with
-        | Some x -> BsonSerializer.Serialize(writer,x.GetType(), x, options)
-        | None -> BsonSerializer.Serialize(writer,typeof<obj>, null, options)
+            match unbox v2 with
+            | None -> BsonSerializer.Serialize(writer,typeof<obj>, null, options)            
+            | Some x -> BsonSerializer.Serialize(writer,x.GetType(), x, options)
+        else
+            BsonSerializer.Serialize(writer,typeof<obj>, null, options)
 
     override this.Deserialize(reader, nominalType, actualType, options) =
-        let value = BsonSerializer.Deserialize(reader, objType.GenericTypeArguments.[0], options)
-
+        let genericTypeArgument = objType.GenericTypeArguments.[0]
+        let value = if (genericTypeArgument.IsPrimitive) then
+                        BsonSerializer.Deserialize(reader, typeof<obj>, options)        
+                    else
+                        BsonSerializer.Deserialize(reader, genericTypeArgument, options)
+        
         let (case, args) =
             match value with
             | null -> (Cases.["None"], [||])
