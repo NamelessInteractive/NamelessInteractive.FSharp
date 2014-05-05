@@ -7,6 +7,7 @@ open MongoDB.Bson
 
 type RecTest = 
         {
+            Id: string
             Foo: int
             Bar: string
         }
@@ -60,6 +61,7 @@ type UnitTest() =
     member x.TestMethod1 () = 
         let testCase = 
             {
+                RecTest.Id = "Hi"
                 RecTest.Foo = 5
                 RecTest.Bar = "Baz"
             }
@@ -81,7 +83,7 @@ type UnitTest() =
                 RecTestWithUnion.Bar3 = UnionTest.TestCase3(1.4)
                 RecTestWithUnion.Bar4 = UnionTest.TestCase4(3.14M)
                 RecTestWithUnion.Bar5 = UnionTest.TestCase5(true)
-                RecTestWithUnion.Bar6 = UnionTest.TestCase6({ RecTest.Foo = 5; RecTest.Bar = "Baz"})
+                RecTestWithUnion.Bar6 = UnionTest.TestCase6({ RecTest.Id = "Moo"; RecTest.Foo = 5; RecTest.Bar = "Baz"})
                 RecTestWithUnion.Bar7 = UnionTest.TestCase7 (None)
                 RecTestWithUnion.Bar8 = UnionTest.TestCase8 
             }
