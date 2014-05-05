@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30324.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NamelessInteractive.FSharp.MongoDB", "NamelessInteractive.FSharp.MongoDB\NamelessInteractive.FSharp.MongoDB.fsproj", "{9CA5E5DE-7AD0-49C1-A6BE-387A6ABA61B5}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NamelessInteractive.FSharp.MongoDBTests", "NamelessInteractive.FSharp.MongoDBTests\NamelessInteractive.FSharp.MongoDBTests.fsproj", "{DD4F1B37-4CCD-46A8-8DE2-7835BD5B52B2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F61DF944-2191-416E-A4CC-3CBCB1989FC5}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9CA5E5DE-7AD0-49C1-A6BE-387A6ABA61B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CA5E5DE-7AD0-49C1-A6BE-387A6ABA61B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CA5E5DE-7AD0-49C1-A6BE-387A6ABA61B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CA5E5DE-7AD0-49C1-A6BE-387A6ABA61B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD4F1B37-4CCD-46A8-8DE2-7835BD5B52B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD4F1B37-4CCD-46A8-8DE2-7835BD5B52B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD4F1B37-4CCD-46A8-8DE2-7835BD5B52B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD4F1B37-4CCD-46A8-8DE2-7835BD5B52B2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
