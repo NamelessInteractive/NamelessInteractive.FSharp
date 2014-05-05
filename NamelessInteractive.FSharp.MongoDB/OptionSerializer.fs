@@ -1,6 +1,7 @@
 ﻿namespace NamelessInteractive.FSharp.MongoDB.Serializers
 
 open Microsoft.FSharp.Reflection
+open MongoDB.Bson
 open MongoDB.Bson.Serialization
 open MongoDB.Bson.Serialization.Serializers
 open NamelessInteractive.FSharp.MongoDB
@@ -22,13 +23,13 @@ type OptionSerializer(objType) =
 
     override this.Deserialize(reader, nominalType, actualType, options) =
         let genericTypeArgument = objType.GenericTypeArguments.[0]
-        let value = if (genericTypeArgument.IsPrimitive) then
-                        BsonSerializer.Deserialize(reader, typeof<obj>, options)        
-                    else
-                        BsonSerializer.Deserialize(reader, genericTypeArgument, options)
         
         let (case, args) =
-            match value with
-            | null -> (Cases.["None"], [||])
-            | _ -> (Cases.["Some"], [| value |])
+                let value = if (genericTypeArgument.IsPrimitive) then
+                                BsonSerializer.Deserialize(reader, typeof<obj>, options)        
+                            else
+                                BsonSerializer.Deserialize(reader, genericTypeArgument, options)
+                match value with
+                | null -> (Cases.["None"], [||])
+                | _ -> (Cases.["Some"], [| value |])
         FSharpValue.MakeUnion(case, args)

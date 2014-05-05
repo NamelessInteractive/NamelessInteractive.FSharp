@@ -4,7 +4,7 @@ open Microsoft.FSharp.Reflection
 open System
 
 [<AutoOpen>]
-module Helpers = 
+module internal Helpers = 
     let IsUnion objType = FSharpType.IsUnion objType
 
     let IsOption objType = IsUnion objType && 
@@ -24,3 +24,9 @@ module Helpers =
         objType.GetGenericTypeDefinition() = typedefof<Set<_>>
 
     let GetUnionCases objType = FSharpType.GetUnionCases(objType) |> Seq.map(fun x -> (x.Name, x)) |> dict
+
+    let IsRecord (objType) =
+        FSharpType.IsRecord(objType)
+
+    let GetRecordFields objType = 
+        FSharpType.GetRecordFields(objType)

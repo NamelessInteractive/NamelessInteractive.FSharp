@@ -29,6 +29,9 @@ type FSharpTypeSerializationProvider() =
             elif IsUnion objType then
                 DiscriminatedUnionSerializer(objType)
                 |> AsBsonSerializer
+            elif IsRecord objType then
+                RecordSerializer(objType)
+                |> AsBsonSerializer
             else
                 null
 

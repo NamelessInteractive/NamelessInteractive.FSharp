@@ -5,79 +5,105 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 
 open MongoDB.Bson
 
-[<CLIMutable>]
 type RecTest = 
         {
-            Id: BsonObjectId
-            Name: string
+            Foo: int
+            Bar: string
         }
 
 type UnionTest =
-    | Case1 of int
-    | Case2
+    | TestCase1 of int
+    | TestCase2 of string
+    | TestCase3 of float
+    | TestCase4 of decimal
+    | TestCase5 of bool
+    | TestCase6 of RecTest
+    | TestCase7 of RecTest option
+    | TestCase8
 
-[<CLIMutable>]
-type Address =
+type RecTestWithUnion = 
     {
-        Address1: string
-        Address2: string
-        Address3: string
-        Address4: string
-        PostalCode: string
-        Country: string
+        Id: BsonObjectId
+        Foo: int
+        Bar1: UnionTest
+        Bar2: UnionTest
+        Bar3: UnionTest
+        Bar4: UnionTest
+        Bar5: UnionTest
+        Bar6: UnionTest
+        Bar7: UnionTest
+        Bar8: UnionTest
     }
 
-type RecTest2() = 
-    member val Id: BsonObjectId = BsonObjectId(ObjectId.GenerateNewId()) with get, set
-    member val Test1: UnionTest = Case2 with get, set
-    member val Test2: UnionTest = Case2 with get, set
-    member val Opt: ResizeArray<string> option = None with get, set
-    member val Bob: ResizeArray<string> option = None with get, set
+type SmallTest =    
+    {
+        Foo: UnionTest
+    }
 
-type Brokerage() =
-    /// The Identity of the Brokerage
-    member val Id: int = 0 with get, set
-    /// The Trading Name of the Brokerage
-    member val TradingName: string = null with get, set
-    /// Type Of Organisation
-    member val OrganisationType: string = null with get, set
-    /// The Registered Name of the Brokerage
-    member val RegisteredName: string = null with get, set
-    /// The Company Registration Number
-    member val CompanyRegistrationNumber: string = null with get, set
-    /// The Company's VAT Number
-    member val VATNumber : string = null with get, set
-    /// The Member's ID Numbers (Only required if Organisation Type is Close Corporation)
-    member val MemberIDNumbers : string[] = [||] with get, set
-    /// The Physical Address
-    member val PhysicalAddress:  Address option = None with get, set
-    /// The Postal Address
-    member val PostalAddress : Address option = None with get, set
-    /// The Telephone Number
-    member val TelephoneNumber: string = null with get, set
-    /// The Fax Number
-    member val FaxNumber: string = null with get, set
-    /// The Company Email Address
-    member val EmailAddress: string = null with get, set
-    /// The Created Date
-    member val DateCreated: DateTime = DateTime.Now with get, set
-    /// The Modified Date
-    member val DateModified: DateTime = DateTime.Now with get, set
+[<AutoOpen>]
+module Helpers =
+    let NewId() = 
+        BsonObjectId(ObjectId.GenerateNewId())
 
 [<TestClass>]
 type UnitTest() = 
     let connectionString = "mongodb://localhost"
     let client = new MongoDB.Driver.MongoClient(connectionString)
     let server = client.GetServer()
-    let database = server.GetDatabase("GoldenGate")
+    let database = server.GetDatabase("TestNamelessFSharpMongo")
     do 
         NamelessInteractive.FSharp.MongoDB.SerializationProviderModule.Register()
+        NamelessInteractive.FSharp.MongoDB.Conventions.ConventionsModule.Register()
     
 
     [<TestMethod>]
     member x.TestMethod1 () = 
-        let collection = database.GetCollection<Brokerage>("Brokerages")
-        //collection.Insert(insertRecord) |> ignore
-        Assert.IsTrue(true)
-        let result = collection.FindOne()
-        Assert.IsTrue(true)
+        let testCase = 
+            {
+                RecTest.Foo = 5
+                RecTest.Bar = "Baz"
+            }
+        let serializer = MongoDB.Bson.Serialization.BsonSerializer.LookupSerializer(testCase.GetType())
+        let collection = database.GetCollection<RecTest>("RecTest")
+        collection.RemoveAll() |> ignore
+        collection.Insert(testCase) |> ignore
+        let saved = collection.FindOne()
+        Assert.AreEqual(testCase,saved)
+
+    [<TestMethod>]
+    member x.TestMethod2 () = 
+        let testCase = 
+            {
+                RecTestWithUnion.Id = NewId()
+                RecTestWithUnion.Foo = 0
+                RecTestWithUnion.Bar1 = UnionTest.TestCase1(2)
+                RecTestWithUnion.Bar2 = UnionTest.TestCase2("BazBar")
+                RecTestWithUnion.Bar3 = UnionTest.TestCase3(1.4)
+                RecTestWithUnion.Bar4 = UnionTest.TestCase4(3.14M)
+                RecTestWithUnion.Bar5 = UnionTest.TestCase5(true)
+                RecTestWithUnion.Bar6 = UnionTest.TestCase6({ RecTest.Foo = 5; RecTest.Bar = "Baz"})
+                RecTestWithUnion.Bar7 = UnionTest.TestCase7 (None)
+                RecTestWithUnion.Bar8 = UnionTest.TestCase8 
+            }
+        let serializer = MongoDB.Bson.Serialization.BsonSerializer.LookupSerializer(testCase.GetType())
+        let collection = database.GetCollection<RecTestWithUnion>("RecTestWithUnion")
+        collection.RemoveAll() |> ignore
+        collection.Insert(testCase) |> ignore
+        let saved = collection.FindOne()
+        Assert.AreEqual(testCase,saved)
+
+    [<TestMethod>]
+    member x.TestMethod3 () = 
+        let testCase = 
+            {
+                SmallTest.Foo = UnionTest.TestCase7 None
+            }
+        let serializer = MongoDB.Bson.Serialization.BsonSerializer.LookupSerializer(testCase.GetType())
+        let collection = database.GetCollection<SmallTest>("RecTestWithUnion")
+        collection.RemoveAll() |> ignore
+        collection.Insert(testCase) |> ignore
+        let saved = collection.FindOne()
+        Assert.AreEqual(testCase,saved)
+
+
+
