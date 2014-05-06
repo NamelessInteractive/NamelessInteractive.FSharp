@@ -51,12 +51,12 @@
   <ItemGroup>
     <Compile Include="Helpers.fs" />
     <Compile Include="Conventions.fs" />
-    <Compile Include="RecordSerializer.fs" />
     <Compile Include="DiscriminatedUnionSerializer.fs" />
     <Compile Include="ListSerializer.fs" />
     <Compile Include="MapSerializer.fs" />
     <Compile Include="SetSerializer.fs" />
     <Compile Include="OptionSerializer.fs" />
+    <Compile Include="RecordSerializer.fs" />
     <None Include="packages.config" />
     <Compile Include="FSharpSerializationProvider.fs" />
   </ItemGroup>

@@ -34,6 +34,7 @@ type RecTestWithUnion =
         Bar6: UnionTest
         Bar7: UnionTest
         Bar8: UnionTest
+        Bar9: int list
     }
 
 type SmallTest =    
@@ -86,6 +87,7 @@ type UnitTest() =
                 RecTestWithUnion.Bar6 = UnionTest.TestCase6({ RecTest.Id = "Moo"; RecTest.Foo = 5; RecTest.Bar = "Baz"})
                 RecTestWithUnion.Bar7 = UnionTest.TestCase7 (None)
                 RecTestWithUnion.Bar8 = UnionTest.TestCase8 
+                RecTestWithUnion.Bar9 = [1;2;3;4;5]
             }
         let serializer = MongoDB.Bson.Serialization.BsonSerializer.LookupSerializer(testCase.GetType())
         let collection = database.GetCollection<RecTestWithUnion>("RecTestWithUnion")
