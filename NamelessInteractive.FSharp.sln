@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F61DF9
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NamelessInteractive.FSharp.OAuth", "NamelessInteractive.FSharp.OAuth\NamelessInteractive.FSharp.OAuth.fsproj", "{90064352-7FE3-4EF3-BD5A-EAAAA81A2ED3}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NamelessInteractive.FSharp.Utilities", "NamelessInteractive.FSharp.Utilities\NamelessInteractive.FSharp.Utilities.fsproj", "{C64ADAD2-DCDB-472B-A2B9-807ED9A3D1C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{90064352-7FE3-4EF3-BD5A-EAAAA81A2ED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90064352-7FE3-4EF3-BD5A-EAAAA81A2ED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90064352-7FE3-4EF3-BD5A-EAAAA81A2ED3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C64ADAD2-DCDB-472B-A2B9-807ED9A3D1C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C64ADAD2-DCDB-472B-A2B9-807ED9A3D1C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C64ADAD2-DCDB-472B-A2B9-807ED9A3D1C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C64ADAD2-DCDB-472B-A2B9-807ED9A3D1C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
