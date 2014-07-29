@@ -44,6 +44,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConversionUtilities.fs" />
     <Compile Include="DateExtensions.fs" />
     <Compile Include="EnumerableExtensions.fs" />
     <Compile Include="Maybe.fs" />
