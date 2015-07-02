@@ -5,13 +5,13 @@ open MongoDB.Bson.Serialization
 open MongoDB.Bson.Serialization.Serializers
 
 type ListSerializer<'ElemType>() = 
-    inherit BsonBaseSerializer()
+    inherit SerializerBase<'ElemType list>()
     
-    let serializer = EnumerableSerializer<'ElemType>()
+    let serializer = EnumerableInterfaceImplementerSerializer<List<'ElemType>, 'ElemType>()
 
-    override this.Serialize(writer, nominalType, value, options) =
-        serializer.Serialize(writer, typeof<IEnumerable<'ElemType>>, value, options)
+    override this.Serialize(context, args, value) =
+        serializer.Serialize(context, args, new List<'ElemType>(value))
 
-    override this.Deserialize(reader, nominalType, actualType, options) =
-        let res = serializer.Deserialize(reader, typeof<IEnumerable<'ElemType>>, options)
-        res |> unbox |> List.ofSeq<'ElemType> |> box
+    override this.Deserialize(context, args) =
+        let res = serializer.Deserialize(context, args)
+        res |> unbox |> List.ofSeq<'ElemType>

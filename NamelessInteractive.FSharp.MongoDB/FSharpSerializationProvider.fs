@@ -12,7 +12,8 @@ type FSharpTypeSerializationProvider() =
     interface IBsonSerializationProvider with
         member this.GetSerializer(objType) =
             if IsOption objType then
-                OptionSerializer(objType) 
+                typedefof<OptionSerializer<_>>.MakeGenericType (objType.GetGenericArguments())
+                |> CreateInstance
                 |> AsBsonSerializer
             elif IsList objType then
                 typedefof<ListSerializer<_>>.MakeGenericType (objType.GetGenericArguments())
@@ -27,10 +28,12 @@ type FSharpTypeSerializationProvider() =
                 |> CreateInstance
                 |> AsBsonSerializer
             elif IsUnion objType then
-                DiscriminatedUnionSerializer(objType)
+                typedefof<DiscriminatedUnionSerializer<_>>.MakeGenericType(objType)
+                |> CreateInstance
                 |> AsBsonSerializer
             elif IsRecord objType then
-                RecordSerializer(objType)
+                typedefof<RecordSerializer<_>>.MakeGenericType(objType)
+                |> CreateInstance
                 |> AsBsonSerializer
             else
                 null

@@ -4,6 +4,7 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 open MongoDB.Bson
+open MongoDB.Driver
 
 type RecTest = 
         {
@@ -51,30 +52,32 @@ module Helpers =
 type UnitTest() = 
     let connectionString = "mongodb://localhost"
     let client = new MongoDB.Driver.MongoClient(connectionString)
-    let server = client.GetServer()
-    let database = server.GetDatabase("TestNamelessFSharpMongo")
+    let database = client.GetDatabase("TestNamelessFSharpMongo")
     do 
         NamelessInteractive.FSharp.MongoDB.SerializationProviderModule.Register()
         NamelessInteractive.FSharp.MongoDB.Conventions.ConventionsModule.Register()
     
 
     [<TestMethod>]
-    member x.TestMethod1 () = 
+    member x.TestMethod1 () =
+        let wildcard = FilterDefinition<RecTest>.op_Implicit("{}")
         let testCase = 
             {
                 RecTest.Id = "Hi"
                 RecTest.Foo = 5
                 RecTest.Bar = "Baz"
             }
+
         let serializer = MongoDB.Bson.Serialization.BsonSerializer.LookupSerializer(testCase.GetType())
         let collection = database.GetCollection<RecTest>("RecTest")
-        collection.RemoveAll() |> ignore
-        collection.Insert(testCase) |> ignore
-        let saved = collection.FindOne()
+        collection.DeleteManyAsync(wildcard) |> ignore
+        collection.InsertOneAsync(testCase).Wait() |> ignore
+        let saved = collection.Find(wildcard).FirstAsync().Result
         Assert.AreEqual(testCase,saved)
 
     [<TestMethod>]
-    member x.TestMethod2 () = 
+    member x.TestMethod2 () =
+        let wildcard = FilterDefinition<RecTestWithUnion>.op_Implicit("{}") 
         let testCase = 
             {
                 RecTestWithUnion.Id = NewId()
@@ -91,22 +94,23 @@ type UnitTest() =
             }
         let serializer = MongoDB.Bson.Serialization.BsonSerializer.LookupSerializer(testCase.GetType())
         let collection = database.GetCollection<RecTestWithUnion>("RecTestWithUnion")
-        collection.RemoveAll() |> ignore
-        collection.Insert(testCase) |> ignore
-        let saved = collection.FindOne()
+        collection.DeleteManyAsync(wildcard).Wait() |> ignore
+        collection.InsertOneAsync(testCase).Wait() |> ignore
+        let saved = collection.Find(wildcard).FirstAsync().Result
         Assert.AreEqual(testCase,saved)
 
     [<TestMethod>]
     member x.TestMethod3 () = 
+        let wildcard = FilterDefinition<SmallTest>.op_Implicit("{}") 
         let testCase = 
             {
                 SmallTest.Foo = UnionTest.TestCase7 None
             }
         let serializer = MongoDB.Bson.Serialization.BsonSerializer.LookupSerializer(testCase.GetType())
         let collection = database.GetCollection<SmallTest>("RecTestWithUnion")
-        collection.RemoveAll() |> ignore
-        collection.Insert(testCase) |> ignore
-        let saved = collection.FindOne()
+        collection.DeleteManyAsync(wildcard).Wait() |> ignore
+        collection.InsertOneAsync(testCase).Wait() |> ignore
+        let saved = collection.Find(wildcard).FirstAsync().Result
         Assert.AreEqual(testCase,saved)
 
 

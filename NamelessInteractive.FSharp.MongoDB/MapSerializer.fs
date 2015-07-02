@@ -6,22 +6,18 @@ open MongoDB.Bson.Serialization
 open MongoDB.Bson.Serialization.Serializers
 
 type MapSerializer<'Key, 'Value when 'Key: comparison>() =
-    inherit BsonBaseSerializer()
+    inherit SerializerBase<Map<'Key, 'Value>>()
 
-    let serializer = DictionarySerializer<'Key, 'Value>()
+    let serializer = DictionaryInterfaceImplementerSerializer<Dictionary<'Key, 'Value>>()
 
-    override this.Serialize(writer, nominalType, value, options) =
+    override this.Serialize(context, args, value) =
         let dictValue =
             value
-            :?> Map<'Key, 'Value>
-            |> Map.toSeq
-            |> dict
+            |> Map.toSeq<'Key, 'Value>
+            |> dict 
+        serializer.Serialize(context, args, dictValue :?> Dictionary<'Key, 'Value>)
 
-        serializer.Serialize(writer,typeof<IDictionary<'Key, 'Value>>, dictValue, options)
-
-    override this.Deserialize(reader, nominalType, actualType, options) =
-        serializer.Deserialize(reader,typeof<IDictionary<'Key,'Value>>, options) 
-        :?> IDictionary<'Key,'Value>
+    override this.Deserialize(context, args) =
+        serializer.Deserialize(context, args)
         |> Seq.map(|KeyValue|)
         |> Map.ofSeq<'Key,'Value>
-        |> box

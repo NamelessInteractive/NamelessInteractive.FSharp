@@ -6,30 +6,25 @@ open MongoDB.Bson.Serialization
 open MongoDB.Bson.Serialization.Serializers
 open NamelessInteractive.FSharp.MongoDB
 
-type OptionSerializer(objType) =
-    inherit BsonBaseSerializer()
+type OptionSerializer<'ElemType when 'ElemType: equality>() =
+    inherit SerializerBase<'ElemType option>()
 
-    let Cases = GetUnionCases objType
+    let Cases = GetUnionCases typeof<'ElemType option>
 
-    override this.Serialize(writer, nominalType, value, options) =
-        if (value <> null) then
-            let v2 = objType.GetProperty("Value").GetValue(value, [| |]) |> Some
+    override this.Serialize(context, args, value) =
+        match value with
+        | None -> BsonSerializer.Serialize(context.Writer, null)            
+        | Some x -> BsonSerializer.Serialize(context.Writer, x)
 
-            match unbox v2 with
-            | None -> BsonSerializer.Serialize(writer,typeof<obj>, null, options)            
-            | Some x -> BsonSerializer.Serialize(writer,x.GetType(), x, options)
-        else
-            BsonSerializer.Serialize(writer,typeof<obj>, null, options)
-
-    override this.Deserialize(reader, nominalType, actualType, options) =
-        let genericTypeArgument = objType.GenericTypeArguments.[0]
+    override this.Deserialize(context, args) =
+        let genericTypeArgument = typeof<'ElemType>
         
         let (case, args) =
                 let value = if (genericTypeArgument.IsPrimitive) then
-                                BsonSerializer.Deserialize(reader, typeof<obj>, options)        
+                                BsonSerializer.Deserialize(context.Reader, typeof<obj>)        
                             else
-                                BsonSerializer.Deserialize(reader, genericTypeArgument, options)
+                                BsonSerializer.Deserialize(context.Reader, genericTypeArgument)
                 match value with
                 | null -> (Cases.["None"], [||])
                 | _ -> (Cases.["Some"], [| value |])
-        FSharpValue.MakeUnion(case, args)
+        FSharpValue.MakeUnion(case, args) :?> 'ElemType option
