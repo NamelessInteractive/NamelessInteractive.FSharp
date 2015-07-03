@@ -112,6 +112,3 @@ type UnitTest() =
         collection.InsertOneAsync(testCase).Wait() |> ignore
         let saved = collection.Find(wildcard).FirstAsync().Result
         Assert.AreEqual(testCase,saved)
-
-
-

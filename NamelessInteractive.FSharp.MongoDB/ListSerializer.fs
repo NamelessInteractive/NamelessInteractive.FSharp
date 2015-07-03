@@ -14,4 +14,4 @@ type ListSerializer<'ElemType>() =
 
     override this.Deserialize(context, args) =
         let res = serializer.Deserialize(context, args)
-        res |> List.ofSeq<'ElemType>
+        res |> unbox |> List.ofSeq<'ElemType>
