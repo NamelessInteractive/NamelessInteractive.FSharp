@@ -5,14 +5,14 @@ open MongoDB.Bson.Serialization
 open MongoDB.Bson.Serialization.Serializers
 
 type SetSerializer<'Type when 'Type: comparison>() =
-    inherit BsonBaseSerializer()
+    inherit SerializerBase<Set<'Type>>()
 
-    let serializer = EnumerableSerializer<'Type>()
+    let serializer = EnumerableInterfaceImplementerSerializer<List<'Type>>()
 
-    override this.Serialize(writer,nominalType, value, options) =
-        serializer.Serialize(writer,typeof<IEnumerable<'Type>>, value, options)
+    override this.Serialize(context, args, value) =
+        serializer.Serialize(context, args, new List<'Type>(value))
 
-    override this.Deserialize(reader,nominalType,actualType,options) =
-        let res = serializer.Deserialize(reader,typeof<IEnumerable<'Type>>, options)
-        res |> unbox |> Set.ofSeq<'Type> |> box
+    override this.Deserialize(context, args) =
+        let res = serializer.Deserialize(context, args)
+        res |> unbox |> Set.ofSeq<'Type>
 

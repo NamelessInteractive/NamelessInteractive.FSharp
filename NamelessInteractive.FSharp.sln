@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NamelessInteractive.FSharp.MongoDB", "NamelessInteractive.FSharp.MongoDB\NamelessInteractive.FSharp.MongoDB.fsproj", "{9CA5E5DE-7AD0-49C1-A6BE-387A6ABA61B5}"
 EndProject

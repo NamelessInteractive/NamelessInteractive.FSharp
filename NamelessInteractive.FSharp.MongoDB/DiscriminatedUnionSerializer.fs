@@ -5,43 +5,47 @@ open Microsoft.FSharp.Reflection
 open System
 open MongoDB.Bson.Serialization
 open MongoDB.Bson.Serialization.Serializers
+open MongoDB.Bson.IO
 
-type DiscriminatedUnionSerializer(objType: Type) =
-    inherit BsonBaseSerializer()
+type DiscriminatedUnionSerializer<'t>() =
+    inherit SerializerBase<'t>()
     let CaseNameField = "Case"
     let ValueFieldName = "Fields"
-    let Cases = GetUnionCases objType
-    let ReadItems (reader) (types) (options) =
+    let Cases = GetUnionCases typeof<'t>
+    let ReadItems (context) (args) (types)  =
         types 
         |> Seq.fold(
             fun state t ->
                 let serializer = BsonSerializer.LookupSerializer(t)
-                let item = serializer.Deserialize(reader,t, options)
+                let item = serializer.Deserialize(context, args)
                 item::state
             ) []
         |> Seq.toArray
         |> Array.rev
 
-    override this.Serialize(writer, nominalType, value, options) =
-        let (case, fields) = FSharpValue.GetUnionFields(value,objType)
-        writer.WriteStartDocument()
-        writer.WriteString(CaseNameField, case.Name)
-        writer.WriteStartArray(ValueFieldName)
+    override this.Deserialize(context, args): 't =
+        context.Reader.ReadStartDocument()
+        let name = context.Reader.ReadString(CaseNameField)
+        let union = Cases.[name]
+        context.Reader.ReadName(ValueFieldName)
+        context.Reader.ReadStartArray()
+        let items = ReadItems context args (union.GetFields() |> Seq.map(fun f -> f.PropertyType))
+        context.Reader.ReadEndArray()
+        context.Reader.ReadEndDocument()
+        FSharpValue.MakeUnion(union, items) :?> 't
+
+    override this.Serialize(context, args, value) =
+        let (case, fields) = FSharpValue.GetUnionFields(value, typeof<'t>)
+        context.Writer.WriteStartDocument()
+        context.Writer.WriteString(CaseNameField, case.Name)
+        context.Writer.WriteStartArray(ValueFieldName)
         fields 
         |> Seq.zip(case.GetFields()) 
         |> Seq.iter(fun (field, value) -> 
             let itemSerializer = BsonSerializer.LookupSerializer(field.PropertyType)
-            itemSerializer.Serialize(writer,field.PropertyType, value, options)
+            itemSerializer.Serialize(context, args, value)
         )
-        writer.WriteEndArray()
-        writer.WriteEndDocument()
+        context.Writer.WriteEndArray()
+        context.Writer.WriteEndDocument()
 
-    override this.Deserialize(reader, nominalType, actualType, options) =
-        reader.ReadStartDocument()
-        let name = reader.ReadString(CaseNameField)
-        let union = Cases.[name]
-        reader.ReadStartArray()
-        let items = ReadItems (reader) (union.GetFields() |> Seq.map(fun f->f.PropertyType)) options
-        reader.ReadEndArray()
-        reader.ReadEndDocument()
-        FSharpValue.MakeUnion(union, items)
+    

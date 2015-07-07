@@ -4,13 +4,17 @@ open System.Collections.Generic
 open MongoDB.Bson.Serialization
 open MongoDB.Bson.Serialization.Serializers
 
-type RecordSerializer(objType) = 
-    inherit BsonBaseSerializer()
-    let classMap = BsonClassMap.LookupClassMap(objType)
-    let classMapSerializer = BsonClassMapSerializer(classMap)
+type RecordSerializer<'TRecord>() = 
+    inherit SerializerBase<'TRecord>()
+    let classMap = BsonClassMap.LookupClassMap(typeof<'TRecord>)
+    let serializer = BsonClassMapSerializer(classMap)
 
-    override this.Serialize(writer, nominalType, value, options) =
-        classMapSerializer.Serialize(writer,nominalType,value,options)
+    override this.Serialize(context, args, value) =
+        let mutable nargs = args
+        nargs.NominalType <- typeof<'TRecord>
+        serializer.Serialize(context, nargs, value)
 
-    override this.Deserialize(reader, nominalType, actualType, options) =
-        classMapSerializer.Deserialize(reader,nominalType,actualType,options)
+    override this.Deserialize(context, args) =
+        let mutable nargs = args
+        nargs.NominalType <- typeof<'TRecord>
+        serializer.Deserialize(context, nargs)
