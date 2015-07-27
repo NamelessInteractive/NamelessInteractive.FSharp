@@ -18,19 +18,18 @@ type RecordConvention() =
 
     interface IClassMapConvention with
         member this.Apply(classMap) =
-         let objType = classMap.ClassType
+            let objType = classMap.ClassType
 
-         if IsRecord objType then
-            classMap.SetIgnoreExtraElements(true)
-            let fields = GetRecordFields objType
-            let names = fields |> Array.map (fun x -> x.Name)
-            let types = fields |> Array.map (fun x -> x.PropertyType)
+            if IsRecord objType then
+                classMap.SetIgnoreExtraElements(true)
+                let fields = GetRecordFields objType
+                let names = fields |> Array.map (fun x -> x.Name)
+                let types = fields |> Array.map (fun x -> x.PropertyType)
 
-            let ctor = objType.GetConstructor(types)
+                let ctor = objType.GetConstructor(types)
             
-            classMap.MapConstructor(ctor) |> ignore
-            fields |> Array.iter (fun x -> classMap.MapMember(x) |> ignore)
-    
+                classMap.MapConstructor(ctor, names) |> ignore
+                fields |> Array.iter (fun x -> classMap.MapMember(x) |> ignore)
 
 module ConventionsModule = 
     let mutable private isRegistered = false

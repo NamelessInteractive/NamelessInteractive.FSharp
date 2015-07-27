@@ -1,10 +1,11 @@
-﻿namespace UnitTestProject1
+﻿namespace NamelessInteractive.FSharp.MongoDBTests
 
 open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 open MongoDB.Bson
 open MongoDB.Driver
+open MongoDB.Bson.Serialization
 
 type RecTest = 
         {
@@ -68,7 +69,6 @@ type UnitTest() =
                 RecTest.Bar = "Baz"
             }
 
-        let serializer = MongoDB.Bson.Serialization.BsonSerializer.LookupSerializer(testCase.GetType())
         let collection = database.GetCollection<RecTest>("RecTest")
         collection.DeleteManyAsync(wildcard) |> ignore
         collection.InsertOneAsync(testCase).Wait() |> ignore
@@ -88,11 +88,11 @@ type UnitTest() =
                 RecTestWithUnion.Bar4 = UnionTest.TestCase4(3.14M)
                 RecTestWithUnion.Bar5 = UnionTest.TestCase5(true)
                 RecTestWithUnion.Bar6 = UnionTest.TestCase6({ RecTest.Id = "Moo"; RecTest.Foo = 5; RecTest.Bar = "Baz"})
-                RecTestWithUnion.Bar7 = UnionTest.TestCase7 (None)
+                RecTestWithUnion.Bar7 = UnionTest.TestCase7(None)
                 RecTestWithUnion.Bar8 = UnionTest.TestCase8 
-                RecTestWithUnion.Bar9 = [1;2;3;4;5]
+                RecTestWithUnion.Bar9 = [1; 2; 3; 4; 5]
             }
-        let serializer = MongoDB.Bson.Serialization.BsonSerializer.LookupSerializer(testCase.GetType())
+
         let collection = database.GetCollection<RecTestWithUnion>("RecTestWithUnion")
         collection.DeleteManyAsync(wildcard).Wait() |> ignore
         collection.InsertOneAsync(testCase).Wait() |> ignore
@@ -106,8 +106,8 @@ type UnitTest() =
             {
                 SmallTest.Foo = UnionTest.TestCase7 None
             }
-        let serializer = MongoDB.Bson.Serialization.BsonSerializer.LookupSerializer(testCase.GetType())
-        let collection = database.GetCollection<SmallTest>("RecTestWithUnion")
+       
+        let collection = database.GetCollection<SmallTest>("SmallTest")
         collection.DeleteManyAsync(wildcard).Wait() |> ignore
         collection.InsertOneAsync(testCase).Wait() |> ignore
         let saved = collection.Find(wildcard).FirstAsync().Result

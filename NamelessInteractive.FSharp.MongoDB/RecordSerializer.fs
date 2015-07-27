@@ -1,6 +1,5 @@
 ﻿namespace NamelessInteractive.FSharp.MongoDB.Serializers
 
-open System.Collections.Generic
 open MongoDB.Bson.Serialization
 open MongoDB.Bson.Serialization.Serializers
 
@@ -16,5 +15,5 @@ type RecordSerializer<'TRecord>() =
 
     override this.Deserialize(context, args) =
         let mutable nargs = args
-        nargs.NominalType <- typeof<'TRecord>
+        nargs.NominalType <- typeof<'TRecord> 
         serializer.Deserialize(context, nargs)
