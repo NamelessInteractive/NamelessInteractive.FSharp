@@ -112,3 +112,12 @@ type UnitTest() =
         collection.InsertOneAsync(testCase).Wait() |> ignore
         let saved = collection.Find(wildcard).FirstAsync().Result
         Assert.AreEqual(testCase,saved)
+
+    [<TestMethod>]
+    member x.TestMethod4 () =
+        let collection = database.GetCollection<RecTest>("RecTest")
+        let serializer = BsonSerializer.LookupSerializer(typeof<RecTest>) :?> IBsonSerializer<RecTest>
+
+        let index = Builders<RecTest>.IndexKeys.Ascending(propertyEx <@ fun (ev: RecTest) -> ev.Id @>)
+        let _ = index.Render(serializer, collection.Settings.SerializerRegistry)
+        ()
