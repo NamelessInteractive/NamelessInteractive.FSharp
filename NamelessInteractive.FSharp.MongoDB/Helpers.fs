@@ -23,7 +23,10 @@ module internal Helpers =
         objType.IsGenericType &&
         objType.GetGenericTypeDefinition() = typedefof<Set<_>>
 
-    let GetUnionCases objType = FSharpType.GetUnionCases(objType) |> Seq.map(fun x -> (x.Name, x)) |> dict
+    let GetUnionCases objType = 
+        FSharpType.GetUnionCases(objType) 
+        |> Seq.map(fun x -> (x.Name, x)) 
+        |> dict
 
     let IsRecord (objType) =
         FSharpType.IsRecord(objType)
